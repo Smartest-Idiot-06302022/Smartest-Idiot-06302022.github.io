@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE ACCESS: Project Console</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Removed Tone.js dependency as 'bad time' command has been removed -->
+    <style>
+        /* Base font for the application. Themes can override this in JS. */
+        body {
+            font-family: Arial, sans-serif; 
+            transition: background-color 0.5s, color 0.5s; /* Smooth transition for mode switch */
+        }
+        
+        :root {
+            /* Dark Mode Colors (Default) - Black, Lime, and Green */
+            --primary-accent: #00ff00; /* Lime Green */
+            --secondary-accent: #39ff14; /* Bright Green */
+            --background-color: #000000; /* Pure Black */
+            --text-color: #ccc; /* Light Gray Text */
+            --terminal-bg: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Light Mode Overrides (Uses Lime/Green accents but with White BG) */
+        body.light-mode {
+            --primary-accent: #00ff00; /* Lime Green */
+            --secondary-accent: #39ff14; /* Bright Green */
+            --background-color: #ffffff; /* Pure White Background (as requested) */
+            --text-color: #333333; /* Dark text for contrast on white background */
+            --terminal-bg: rgba(255, 255, 255, 0.9); /* Translucent White Terminal */
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* Custom CSS for the Glitch/Neon Title Effect (Uses secondary accent) */
+        .neon-text {
+            color: var(--secondary-accent);
+            /* The text-shadow property has been removed to eliminate the glow effect. */
+        }
+        
+        /* Apply colors using CSS variables for dynamic switching */
+        .terminal-container {
+            background-color: var(--terminal-bg);
+            border: 2px solid var(--primary-accent);
+            box-shadow: 0 0 10px var(--primary-accent);
+        }
+
+        .terminal-container a {
+            color: var(--secondary-accent);
+        }
+
+        .terminal-container a:hover {
+            color: var(--primary-accent);
+            text-shadow: 0 0 5px var(--primary-accent);
+        }
+        
+        .terminal-container h2 {
+            color: var(--primary-accent);
+            border-bottom-color: var(--primary-accent);
+        }
+        
+        .status-text {
+            color: var(--primary-accent);
+        }
+        .log-init-access {
+            color: var(--primary-accent);
+        }
+        .log-status-task {
+            color: var(--secondary-accent);
+        }
+
+        /* --- Custom Scrollbar Styling for System Log --- */
+        /* Note: This primarily targets WebKit browsers (Chrome, Safari) */
+        #system-log::-webkit-scrollbar {
+            width: 8px; /* Narrower scrollbar */
+        }
+        /* Style the track (the background path) */
+        #system-log::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3); /* Dark track, slightly transparent */
+            border-radius: 10px;
+        }
+        /* Style the thumb (the moveable part) */
+        #system-log::-webkit-scrollbar-thumb {
+            background: var(--primary-accent); /* Use the bright primary accent color */
+            border-radius: 10px;
+            /* Optional: Add a subtle border for depth */
+            border: 1px solid var(--terminal-bg); 
+        }
+        /* Style the thumb on hover */
+        #system-log::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-accent); /* Slightly different accent on hover */
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto p-6 rounded-lg terminal-container">
+
+        <!-- Header and Status Message -->
+        <header class="mb-8 flex justify-between items-start">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold neon-text mb-2">
+                    // Root access granted
+                </h1>
+                <p class="text-xs status-text text-center tracking-widest">
+                    <span class="animate-pulse">> Warning: Data stream monitoring active</span>
+                </p>
+            </div>
+            
+            <!-- Light/Dark Mode Switch Button - Using only symbols -->
+            <button id="mode-toggle" 
+                    class="p-2 rounded-full font-bold text-lg transition duration-300 shadow-md 
+                           bg-gray-700 text-white hover:bg-gray-600 dark-mode-button"
+                    onclick="toggleMode()">
+                <!-- Initial content will be set by the script -->
+            </button>
+        </header>
+
+        <!-- Access Log Placeholder (Atmosphere) -->
+        <section class="mb-10 p-4 border border-gray-700 bg-black/50 rounded-lg shadow-inner">
+            <h2 class="text-lg font-semibold log-status-task mb-2">
+                > System log
+            </h2>
+            <pre id="system-log" class="text-sm text-gray-500 overflow-auto whitespace-pre-wrap max-h-48">
+[00:00:01] <span class="log-init-access">INIT:</span> Boot sequence complete. Authentication services online.
+[00:00:03] <span class="log-status-task">STATUS:</span> Project index loaded successfully.
+[00:00:04] <span class="log-init-access">ACCESS:</span> User 'guest_hacker' connected from {ip_address_redacted}.
+[00:00:06] <span class="log-status-task">TASK:</span> Scanning for new Java artifacts... 0 found.
+[00:00:10] <span class="text-gray-400">SYSTEM:</span> Ready for command input.
+            </pre>
+        </section>
+
+
+        <!-- Java Project Links Section -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2">
+                > External links
+            </h2>
+
+            <ul class="space-y-4">
+                <!-- Link 1: https://skinmc.net -->
+                <li class="link-item">
+                    <a href="https://skinmc.net" target="_blank" class="text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3.28a1 1 0 01.948.684L10 6h5a1 1 0 011 1v7a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm9 2H9.284l-.564-.816A1 1 0 008.28 5H4v10h12V7h-4a1 1 0 01-.948-.684L12 6z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-400">// Project 01: Digital disguise matrix</span>
+                        <span class="ml-auto text-xs text-gray-600">[ Status: Online ]</span>
+                    </a>
+                </li>
+                <!-- Link 2: https://www.youtube.com -->
+                <li class="link-item">
+                    <a href="https://www.youtube.com" target="_blank" class="text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3.28a1 1 0 01.948.684L10 6h5a1 1 0 011 1v7a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm9 2H9.284l-.564-.816A1 1 0 008.28 5H4v10h12V7h-4a1 1 0 01-.948-.684L12 6z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-400">// Project 02: Visual data stream intercept</span>
+                        <span class="ml-auto text-xs text-gray-600">[ Status: Online ]</span>
+                    </a>
+                </li>
+                <!-- Link 3: https://gemini.google.com/app -->
+                <li class="link-item">
+                    <a href="https://gemini.google.com/app" target="_blank" class="text-lg flex items-center">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3.28a1 1 0 01.948.684L10 6h5a1 1 0 011 1v7a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm9 2H9.284l-.564-.816A1 1 0 008.28 5H4v10h12V7h-4a1 1 0 01-.948-.684L12 6z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-400">// Project 03: Core generative intelligence</span>
+                        <span class="ml-auto text-xs text-gray-600">[ Status: Online ]</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Command Hint -->
+        <p class="text-sm italic mb-2 status-text">
+            > Hint: Try typing <span class="font-bold">help</span>
+        </p>
+
+        <!-- Command Input Section -->
+        <section class="mb-10 p-4 rounded-lg shadow-inner" 
+                 style="border: 2px solid var(--primary-accent); background-color: var(--terminal-bg);">
+            <div class="flex items-center">
+                <!-- Command Prompt Prefix (c:\users\hacker>) -->
+                <span class="status-text font-bold mr-2">c:\users\hacker></span>
+                
+                <!-- Input Field -->
+                <input type="text" id="command-input" placeholder="type your command here..."
+                       class="flex-1 text-sm p-0 bg-transparent border-0 outline-none focus:ring-0"
+                       style="color: var(--secondary-accent); caret-color: var(--secondary-accent);"
+                >
+            </div>
+        </section>
+
+        <!-- Footer Terminal Prompt -->
+        <footer class="text-sm text-gray-400 pt-4 border-t border-gray-800">
+            <span class="status-text font-bold">c:\users\hacker\projects></span> <span class="log-status-task">ls -la *.java</span>
+            <span class="block mt-1 text-gray-500">// Directory is ready for artifact deployment.</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const root = document.documentElement;
+
+        // Function to get a random ASCII art string (for the 'asciiart' command)
+        function getAsciiArt() {
+            const art = [
+                // Cat
+                `
+  /\\_/\\
+ ( o.o )
+  > ^ <
+`,
+                // Simple Computer
+                `
+ _|_|_|_|_|_|_
+| Hacker 9000 |
+|-------------|
+| > command   |
+|_|_|_|_|_|_|_|
+`,
+                // CRT Computer
+                `
+              .----.
+  .---------. | == |
+  |.-"""""-.| |----|
+  ||       || | == |
+  ||       || |----|
+  |'-.....-'| |::::|
+  \`"")---(""\` |___.|
+ /:::::::::::\\" _ "
+/:::=======:::\\\`\`\`\\
+\`"""""""""""""\` '-'
+`, // Correctly closed and comma-separated
+
+                // Ship Art 1
+                `
+              />
+ (           //------------------------------------------------------(
+(*)OXOXOXOXO(*>                  --------                             
+ (           \\--------------------------------------------------------)
+              \>
+`, // Correctly closed and comma-separated
+
+                // Ship Art 2 (Internal backticks escaped)
+                `
+ +--^----------,--------,-----,--------^-,
+ | |||||||||   \`--------'     |          O
+ \`+---------------------------^----------|
+   \`\\_,---------,---------,--------------'
+     / XXXXXX /'|       /'
+    / XXXXXX /  \`\\    /'
+   / XXXXXX /\\\`-------'
+  / XXXXXX /
+ / XXXXXX /
+(________(                
+ \`------'
+`
+            ];
+            return art[Math.floor(Math.random() * art.length)];
+        }
+
+        // Function to get a random motivational quote (for the 'inspire' command)
+        function getInspirationalQuote() {
+            const quotes = [
+                "Life is what happens to us while we are making other plans.",
+                "Doubt kills more dreams than failure ever will.",
+                "Whether you think you can or think you can’t, you’re right.",
+                "Nothing is impossible. The word itself says ‘I’m possible!”",
+                "Folks are usually about as happy as they make up their minds to be.",
+                "It is during our darkest moments that we must focus to see the light.",
+                "The bad news is time flies. The good news is you’re the pilot.",
+                "Learn as if you will live forever, live like you will die tomorrow.",
+                "All our dreams can come true if we have the courage to pursue them.",
+                "Never bend your head. Always hold it high. Look the world straight in the eye.",
+                "May your choices reflect your hopes, not your fears.",
+                "Let us make our future now, and let us make our dreams tomorrow’s reality.",
+                "It’s not whether you get knocked down, it’s whether you get back up.",
+                "When one door closes, sometimes we need to turn the knob to open another.",
+                "We become what we think about."
+            ];
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            // Format the quote with some fun terminal style
+            return `\n  >>> === MOTIVATION CORE ONLINE === <<<\n  >>> "${quote}" <<<\n  >>> ============================== <<<`;
+        }
+
+        // Function to set custom theme colors
+        function setCustomTheme(themeName) {
+            const body = document.body;
+            const toggleButton = document.getElementById('mode-toggle');
+            
+            // 1. Reset custom font family property and text transform
+            body.style.fontFamily = ''; 
+            body.style.textTransform = ''; // Reset case for standard sentence case behavior
+
+            // First, remove the light mode class if a custom dark theme is being applied
+            if (themeName !== 'light') {
+                body.classList.remove('light-mode');
+            }
+
+            // Reset button styling to default Tailwind classes before applying custom styles
+            toggleButton.classList.add('bg-gray-700', 'text-white', 'hover:bg-gray-600'); 
+            toggleButton.style.backgroundColor = ''; 
+            toggleButton.style.color = ''; 
+            toggleButton.style.boxShadow = ''; 
+
+            if (themeName === 'cyn') {
+                // Apply CYN theme colors
+                root.style.setProperty('--primary-accent', '#ffcc00'); // Yellow
+                root.style.setProperty('--secondary-accent', '#ff9900'); // Orangish Yellow
+                root.style.setProperty('--background-color', '#0a0a0a'); // Dark Gray (Original default)
+                root.style.setProperty('--terminal-bg', 'rgba(0, 0, 0, 0.8)');
+                root.style.setProperty('--text-color', '#eee');
+                
+            } else if (themeName === 'minecraft') {
+                
+                // Apply Minecraft theme colors
+                root.style.setProperty('--primary-accent', '#706f6e'); // Stone Gray
+                root.style.setProperty('--secondary-accent', '#5E9D34'); // Green Grass
+                root.style.setProperty('--background-color', '#6EB1FF'); // Sky Blue
+                root.style.setProperty('--terminal-bg', 'rgba(110, 177, 255, 0.8)'); // Translucent Sky
+                root.style.setProperty('--text-color', '#333333'); // Dark Text for contrast
+
+            } else if (themeName === 'pac-man') {
+                
+                // Apply PAC-MAN theme colors (Swapped Blue/Yellow)
+                root.style.setProperty('--primary-accent', '#1919A6'); // Dark Blue (New Primary - For borders/headers)
+                root.style.setProperty('--secondary-accent', '#FFFF00'); // Yellow (New Secondary - For links/input text)
+                root.style.setProperty('--background-color', '#000000'); // Black (Screen/Maze)
+                root.style.setProperty('--terminal-bg', 'rgba(0, 0, 0, 0.9)'); // Slightly opaque black console
+                
+                root.style.setProperty('--text-color', '#FFFFFF'); // White text
+                
+                // Custom button appearance for Pac-Man (Color only)
+                // The button is now Dark Blue with a Yellow icon/text and Yellow glow.
+                toggleButton.classList.remove('bg-gray-700', 'text-white', 'hover:bg-gray-600'); 
+                toggleButton.style.backgroundColor = 'var(--primary-accent)'; 
+                toggleButton.style.color = 'var(--secondary-accent)'; 
+                toggleButton.style.boxShadow = `0 0 15px var(--secondary-accent)`; // Use secondary (Yellow) for glow
+
+            } else if (themeName === 'uzi') {
+                
+                // Apply UZI theme colors (Dark Purple theme)
+                root.style.setProperty('--primary-accent', '#5e2682'); // Deep rich purple
+                root.style.setProperty('--secondary-accent', '#8c79b2'); // Muted light purple
+                // CHANGE: Set background-color to pure black (#000000)
+                root.style.setProperty('--background-color', '#000000'); 
+                root.style.setProperty('--terminal-bg', 'rgba(0, 0, 0, 0.8)'); // Translucent background
+                root.style.setProperty('--text-color', '#e0e0e0'); // Light gray text for contrast
+
+                // Use default button styling, but clear potential old custom styles
+                toggleButton.style.backgroundColor = ''; 
+                toggleButton.style.color = ''; 
+                toggleButton.style.boxShadow = ''; 
+                
+            } else if (themeName === 'sans') {
+                
+                // Apply SANS theme colors and font
+                root.style.setProperty('--primary-accent', '#3399ff'); // Bright Blue
+                root.style.setProperty('--secondary-accent', '#00ffff'); // Cyan
+                root.style.setProperty('--background-color', '#0a0a0a'); // Very Dark Gray
+                root.style.setProperty('--terminal-bg', 'rgba(10, 10, 10, 0.9)'); 
+                root.style.setProperty('--text-color', '#eee'); // Light Text
+                
+                // Set the Comic Sans font as requested
+                body.style.fontFamily = "'Comic Sans MS', 'Comic Sans', cursive";
+                // Force all text to lowercase for the sans theme
+                body.style.textTransform = 'lowercase'; 
+
+                // Use default button styling
+                toggleButton.style.backgroundColor = ''; 
+                toggleButton.style.color = ''; 
+                toggleButton.style.boxShadow = ''; 
+                
+            } else if (themeName === 'papyrus') {
+                
+                // Apply PAPYRUS theme colors and font
+                root.style.setProperty('--primary-accent', '#ffe467'); // Light Yellow/Gold
+                root.style.setProperty('--secondary-accent', '#ff4711'); // Orange/Red
+                root.style.setProperty('--background-color', '#ffffff'); // White
+                root.style.setProperty('--terminal-bg', 'rgba(255, 255, 255, 0.9)'); 
+                root.style.setProperty('--text-color', '#333333'); // Dark Text for contrast
+
+                // Set the Papyrus font and force uppercase
+                body.style.fontFamily = "'Papyrus', fantasy";
+                body.style.textTransform = 'uppercase';
+
+                // Use default button styling
+                toggleButton.style.backgroundColor = ''; 
+                toggleButton.style.color = ''; 
+                toggleButton.style.boxShadow = ''; 
+            
+            } else if (themeName === 'alastor') {
+                
+                // Apply ALASTOR theme colors (Dark Red/Red theme)
+                root.style.setProperty('--primary-accent', '#FF0000'); // Red
+                root.style.setProperty('--secondary-accent', '#FF6666'); // Light Red/Pink
+                root.style.setProperty('--background-color', '#600000'); // Dark Red
+                root.style.setProperty('--terminal-bg', 'rgba(96, 0, 0, 0.9)'); // Translucent Dark Red
+                root.style.setProperty('--text-color', '#FFFFFF'); // White text for contrast
+
+                // Use default button styling
+                toggleButton.style.backgroundColor = ''; 
+                toggleButton.style.color = ''; 
+                toggleButton.style.boxShadow = ''; 
+            
+            } else if (themeName === 'dark') {
+                // Custom dark theme: Black/Lime/Green (matches :root default)
+                root.style.setProperty('--primary-accent', '#00ff00'); 
+                root.style.setProperty('--secondary-accent', '#39ff14');
+                root.style.setProperty('--background-color', '#000000'); 
+                root.style.setProperty('--terminal-bg', 'rgba(0, 0, 0, 0.8)');
+                root.style.setProperty('--text-color', '#ccc');
+            } else if (themeName === 'light') {
+                // Light mode is now styled using the lime/green accents from the CSS block above
+                root.style.removeProperty('--primary-accent');
+                root.style.removeProperty('--secondary-accent');
+                root.style.removeProperty('--background-color');
+                root.style.removeProperty('--terminal-bg');
+                root.style.removeProperty('--text-color');
+
+                // The button reset has already happened at the start of the function for consistency.
+            }
+
+            // Save the theme setting
+            localStorage.setItem('theme', themeName);
+        }
+
+        // Function to toggle between dark and light modes
+        function toggleMode() {
+            const body = document.body;
+            const toggleButton = document.getElementById('mode-toggle');
+
+            // If a custom theme is active, reset it to standard dark before toggling to light mode
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'cyn' || currentTheme === 'minecraft' || currentTheme === 'pac-man' || currentTheme === 'uzi' || currentTheme === 'sans' || currentTheme === 'papyrus' || currentTheme === 'alastor') {
+                // Reset to standard dark theme first (which is now black/lime/green)
+                setCustomTheme('dark'); 
+            }
+
+            // Toggle the 'light-mode' class on the body
+            body.classList.toggle('light-mode');
+
+            // Update the button content and state (only symbols)
+            if (body.classList.contains('light-mode')) {
+                toggleButton.innerHTML = '⏾'; // Dark mode symbol
+                localStorage.setItem('theme', 'light');
+            } else {
+                toggleButton.innerHTML = '☀︎'; // Light mode symbol
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Function to process the command input and update the log
+        function processCommand() {
+            const inputField = document.getElementById('command-input');
+            const logElement = document.getElementById('system-log');
+            const fullCommand = inputField.value.trim();
+
+            if (fullCommand === "") {
+                inputField.value = "";
+                return; // Do nothing if input is empty
+            }
+
+            // 1. Parse command and arguments
+            const parts = fullCommand.toLowerCase().split(/\s+/).filter(p => p.length > 0);
+            const mainCommand = parts[0];
+            const argument = parts[1]; // Argument for 'help [command]'
+
+            // 2. Get current time
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            // 3. Log the user command entry first
+            // Note: USER command input is displayed as typed for authenticity, but the main command is parsed as lowercase.
+            const userLogEntry = `[${time}] <span class="log-status-task">USER:</span> <span class="text-gray-400">${fullCommand}</span>\n`;
+            let systemResponse = '';
+            
+            const logType = '<span class="log-init-access">SYSTEM:</span>';
+
+            // Command details map (including hidden commands for specific help lookups)
+            const commandDetails = {
+                'help': 'Shows a list of all active commands. Use `help [command]` for detailed command information.',
+                'clear': 'Clears all historical entries and log data from the system log buffer.',
+                'exit': 'Terminates the current user session and attempts to close the window.',
+                'echo': 'Outputs the text provided immediately after the command.',
+                'time': 'Displays the current system time and date.',
+                'scan': 'Simulates a network port scan, listing fake targets.',
+                'asciiart': 'Prints a random, generated ASCII art image.', 
+                'inspire': 'Generates a random, motivational quote with a unique style.', 
+                'drones': 'Initiates contact with experimental drone units.', 
+                'undertale': 'Accesses ancient gaming archives.', 
+                'games': 'Fetches external visual stream links.', 
+                'rickroll': 'Executes a secret fun protocol.', // Hidden
+                'cyn': 'Applies a dark, high-contrast yellow/orange "cyn" theme (Developer setting).',
+                'minecraft': 'Applies a light, earthy "minecraft" theme (Developer setting).',
+                'pac-man': 'Applies a classic arcade "pac-man" theme (black/yellow) (Developer setting).',
+                'uzi': 'Applies a dark, rich "uzi" theme (Purple/Black theme) (Developer setting).',
+                'sans': 'Applies a friendly blue/cyan theme with the Comic Sans font (Developer setting).',
+                'papyrus': 'Applies an ancient gold/orange theme with the Papyrus font and all uppercase text (Developer setting).', 
+                'alastor': 'Applies a dark red, high-contrast "alastor" theme (Developer setting).',
+            };
+            
+            // Commands visible in general help list
+            const visibleCommands = ['help', 'clear', 'exit', 'echo', 'time', 'scan', 'asciiart', 'inspire', 'drones', 'undertale', 'games']; 
+
+            // --- Special Command Handling ---
+            if (mainCommand === 'exit') {
+                // RESTORED: Exit command functionality
+                systemResponse = `${logType} Terminating session... Goodbye.`;
+                // Attempt to close the window after a slight delay
+                setTimeout(() => window.close(), 500);
+            } 
+            else if (mainCommand === 'help') {
+                // HELP command remains functional
+                if (argument === 'undertale') { // Secret Easter Egg Command 1
+                    systemResponse = `${logType} The skelebros Sans and Papyrus`;
+                }
+                else if (argument === 'drones') { // Secret Easter Egg Command 2: Added 'help drones'
+                    systemResponse = `${logType} The drones UZI and CYN have proven problematic.`;
+                }
+                else if (argument === 'games') { // Secret Easter Egg Command 3: Added 'help games'
+                    systemResponse = `${logType} https://www.youtube.com/watch?v=AAp-2L682Jg`;
+                }
+                else if (argument && commandDetails[argument]) {
+                    // Detailed help requested for a known command
+                    systemResponse = `${logType} Help details for: ${argument}\n  > ${commandDetails[argument]}`;
+                } else if (argument) {
+                    // Unknown command requested for help
+                    systemResponse = `${logType} <span style="color: #ff0000;">Error:</span> Detailed help for command '${argument}' not found.`;
+                } else {
+                    // General help requested
+                    let commandList = visibleCommands.map(cmd => 
+                        // Show the first sentence of the detail description
+                        `  > ${cmd.padEnd(15)}: ${commandDetails[cmd].split('.')[0]}.` 
+                    ).join('\n');
+
+                    systemResponse = `${logType} Executing help query...
+Type 'help [command]' for more details.
+Available system commands:
+${commandList}
+  > Hint: Accessing secret system protocols requires careful keyword selection.`; 
+                }
+            }
+            else if (mainCommand === 'echo') { 
+                // RESTORED: Echo command functionality
+                const textToEcho = fullCommand.substring(mainCommand.length).trim() || "Ready to echo.";
+                systemResponse = `${logType} ECHO: ${textToEcho}`;
+            }
+            else if (mainCommand === 'time') { 
+                // RESTORED: Time command functionality
+                const fullDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                systemResponse = `${logType} DATE: ${fullDate}\n${logType} TIME: ${time}`;
+            }
+            else if (mainCommand === 'asciiart') { 
+                // RESTORED: ASCII Art command functionality
+                systemResponse = `${logType} GENERATING RANDOM ASCII ART...\n${getAsciiArt()}`;
+            }
+            else if (mainCommand === 'inspire') { 
+                // RESTORED: Inspire command functionality
+                systemResponse = `${logType} ${getInspirationalQuote()}`;
+            }
+            else if (mainCommand === 'rickroll') { // RICKROLL EASTER EGG (Hidden) - Remains functional
+                systemResponse = `
+${logType} Access denied. (Protocol 867-5309 executed.)
+  > Never gonna give you up
+  > Never gonna let you down
+  > Never gonna run around and desert you
+  > Never gonna make you cry
+  > Never gonna say goodbye
+  > Never gonna tell a lie and hurt you
+${logType} System check OK. Protocol 867-5309 is harmless.
+        `;
+            }
+            else if (mainCommand === 'scan') { 
+                // RESTORED: Scan command functionality
+                systemResponse = `${logType} Executing network scan protocol...\n  > Target: 192.168.1.1 [ONLINE]\n  > Target: 10.0.0.42 [ONLINE]\n  > Target: 172.16.8.9 [OFFLINE]\n  > Scan complete. 2/3 targets responsive.`;
+            }
+            // NEW: Handle direct execution of the new keywords with an error message
+            else if (mainCommand === 'drones' || mainCommand === 'undertale' || mainCommand === 'games') {
+                 // Print an error message prompting the user to use 'help [command]'
+                 systemResponse = `${logType} <span style="color: #ff0000;">Error:</span> Protocol '${mainCommand.toUpperCase()}' cannot be executed directly. Try 'help ${mainCommand}' for initiation instructions.`;
+            }
+            // Keep theme commands runnable (Developer settings)
+            else if (mainCommand === 'cyn') {
+                // ACTION: Change theme colors
+                systemResponse = `${logType} Applying 'cyn' theme: black background, yellow/orange accents.`;
+                setCustomTheme('cyn');
+                document.getElementById('mode-toggle').innerHTML = '☀︎'; 
+            } else if (mainCommand === 'minecraft') {
+                // ACTION: Change theme colors to Minecraft theme
+                systemResponse = `${logType} Applying 'minecraft' theme: sky blue background, grass green/stone gray accents.`;
+                setCustomTheme('minecraft');
+                document.getElementById('mode-toggle').innerHTML = '⏾'; 
+            } else if (mainCommand === 'pac-man') {
+                // ACTION: Change theme colors to Pac-Man theme and change button icon
+                systemResponse = `${logType} Applying 'pac-man' theme: classic arcade colors (black and yellow).`;
+                setCustomTheme('pac-man');
+                document.getElementById('mode-toggle').innerHTML = '☀︎'; 
+            } else if (mainCommand === 'uzi') {
+                // ACTION: Change theme colors to UZI theme
+                systemResponse = `${logType} Applying 'uzi' theme: deep purple and black accents.`;
+                setCustomTheme('uzi');
+                document.getElementById('mode-toggle').innerHTML = '☀︎'; 
+            } else if (mainCommand === 'sans') {
+                // ACTION: Change theme colors to Sans theme
+                systemResponse = `${logType} Applying 'sans' theme: friendly cyan/blue accents and playful font.`;
+                setCustomTheme('sans');
+                document.getElementById('mode-toggle').innerHTML = '☀︎'; 
+            } else if (mainCommand === 'papyrus') {
+                // ACTION: Change theme colors to Papyrus theme
+                systemResponse = `${logType} Applying 'papyrus' theme: ancient script colors and stylized font.`;
+                setCustomTheme('papyrus');
+                document.getElementById('mode-toggle').innerHTML = '⏾'; // Dark symbol on light background
+            } else if (mainCommand === 'alastor') {
+                // ACTION: Change theme colors to Alastor theme (New Red Theme)
+                systemResponse = `${logType} Applying 'alastor' theme: dark red background and bright red accents.`;
+                setCustomTheme('alastor');
+                document.getElementById('mode-toggle').innerHTML = '☀︎'; 
+            }
+            else if (mainCommand === 'clear') {
+                // CLEAR command remains functional
+                systemResponse = `${logType} Console buffer cleared.`;
+
+                // Instead of prepending, we completely overwrite the log with the user command and the system response
+                logElement.innerHTML = userLogEntry + systemResponse + '\n';
+                
+                // Clear the input box and return to prevent default logging
+                inputField.value = "";
+                logElement.scrollTop = 0;
+                return;
+
+            } else {
+                // Default error response for unknown commands
+                systemResponse = `${logType} <span style="color: #ff0000;">Error:</span> Command '${mainCommand}' not recognized. Type 'help' for a list of valid commands.`;
+            }
+
+            // 4. Prepend user command and system response to the log (DEFAULT ACTION)
+            const existingLog = logElement.innerHTML;
+            const newContent = userLogEntry + systemResponse + '\n';
+            let combinedLog = newContent + existingLog;
+
+            // Retain all log entries but remove any accidental empty lines
+            let lines = combinedLog.trim().split('\n');
+            lines = lines.filter(line => line.trim() !== ''); 
+            
+            // Update the log element with the full, uncapped log
+            logElement.innerHTML = lines.join('\n');
+            
+            // 5. Clear the input box
+            inputField.value = "";
+            
+            // 6. Scroll the log to the top (so the newest entry is visible)
+            logElement.scrollTop = 0;
+        }
+
+
+        // On page load, check for a saved theme preference and set the button symbol
+        window.onload = function() {
+            const body = document.body;
+            const toggleButton = document.getElementById('mode-toggle');
+            const inputField = document.getElementById('command-input'); 
+            
+            // Adjust button size for symbol-only content
+            toggleButton.classList.remove('text-sm');
+            toggleButton.classList.add('text-xl', 'w-10', 'h-10'); 
+
+            const savedTheme = localStorage.getItem('theme');
+
+            // Explicitly call setCustomTheme for 'dark' to ensure new colors are applied
+            if (savedTheme === 'cyn' || savedTheme === 'pac-man' || savedTheme === 'uzi' || savedTheme === 'dark' || savedTheme === 'sans' || savedTheme === 'alastor') {
+                setCustomTheme(savedTheme); 
+                
+                // Set light symbol for contrast on the dark background
+                toggleButton.innerHTML = '☀︎'; 
+
+            } else if (savedTheme === 'minecraft' || savedTheme === 'papyrus') {
+                setCustomTheme(savedTheme); 
+                // Set dark symbol for contrast on light background
+                toggleButton.innerHTML = '⏾'; 
+            }
+            
+            else if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+                setCustomTheme('light'); // Apply standard light mode styles/resets
+                // Set to Dark mode symbol when currently in Light mode
+                toggleButton.innerHTML = '⏾'; 
+            } else { // default to dark
+                setCustomTheme('dark'); // Ensure defaults are set (now black/lime/green)
+                 // Set to Light mode symbol when currently in Dark mode
+                toggleButton.innerHTML = '☀︎';
+            }
+
+            // Add Event Listener for 'Enter' key press on the input field
+            inputField.addEventListener('keyup', function(event) {
+                // Check if the pressed key is 'Enter'
+                if (event.key === 'Enter') {
+                    processCommand();
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
