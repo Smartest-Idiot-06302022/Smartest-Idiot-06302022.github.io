@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Biome Image Gallery | >_ HACKER MODE</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use a Hacker/Monospace Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the Hacker/Terminal Aesthetic */
+        body {
+            font-family: 'Fira Code', 'Courier New', monospace; /* Monospace Font */
+            background-color: #0a0a0a; /* Near-black background */
+            color: #00ff00; /* Neon Green base text color */
+        }
+        .image-card {
+            transition: all 0.3s ease;
+            border: 1px solid #005500; /* Darker green border */
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.2); /* Subtle green glow */
+            background-color: #1a1a1a; /* Very dark card background */
+        }
+        .image-card:hover {
+            transform: translateY(-4px);
+            border-color: #00ff00; /* Neon green border on hover */
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6), 0 0 5px rgba(0, 255, 0, 0.4); /* Intense green glow on hover */
+        }
+        .image-card img {
+            object-fit: cover;
+            aspect-ratio: 16 / 9;
+        }
+        /* Removed .hacker-text-glow class */
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header updated for hacker theme -->
+        <header class="text-center mb-12">
+            <!-- Removed hacker-text-glow class from h1 -->
+            <h1 class="text-5xl font-extrabold text-green-400 mb-2"> >_ BIOME GALLERY INITIALIZED</h1>
+            <p class="text-xl text-green-500">ACCESS GRANTED. Displaying responsive grid data (64 total).</p>
+        </header>
+
+        <!-- Image Grid Container -->
+        <div id="image-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Images will be injected here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // ==============================================================================
+        // 🚀 EASY IMAGE UPDATE SECTION 🚀
+        // NOTE: All image paths now start with 'assets/' for GitHub Pages structure.
+        // To add new images: just paste the exact filename (e.g., 'assets/New_Biome.webp')
+        // into this array. The rest of the script handles the gallery automatically!
+        // ==============================================================================
+        const imageFiles = [
+            'assets/Ocean.webp',
+            'assets/Deep_Ocean.webp',
+            'assets/Warm_Ocean.webp',
+            'assets/Lukewarm_Ocean.webp',
+            'assets/Deep_Lukewarm_Ocean.webp',
+            'assets/Deep_Cold_Ocean.webp',
+            'assets/Frozen_Ocean.webp',
+            'assets/Deep_Frozen_Ocean.webp',
+            'assets/Mushroom_Fields.webp',
+            'assets/Jagged_Peaks.webp',
+            'assets/Frozen_Peaks.webp',
+            'assets/Stony_Peaks.webp',
+            'assets/Meadow.webp',
+            'assets/Cherry_Grove.webp',
+            'assets/Grove.webp',
+            'assets/Snowy_Peaks.webp',
+            'assets/Windswept_Hills.webp',
+            'assets/Windswept_Gravelly_Hills.webp',
+            'assets/Windswept_Forest.webp',
+            'assets/Forest.webp',
+            'assets/Flower_Forest.webp',
+            'assets/Taiga.webp',
+            'assets/Old_Growth_Pine_Taiga.webp',
+            'assets/Old_Growth_Spruce_Taiga.webp',
+            'assets/Snowy_Taiga.webp',
+            'assets/Birch_Forest.webp',
+            'assets/Old_Growth_Birch_Forest.webp',
+            'assets/Dark_Forest.webp',
+            'assets/Pale_Garden.webp',
+            'assets/Jungle.webp',
+            'assets/Sparse_Jungle.webp',
+            'assets/Bamboo_Jungle.webp',
+            'assets/River.webp',
+            'assets/Frozen_River.webp',
+            'assets/Swamp.webp',
+            'assets/Mangrove_Swamp.webp',
+            'assets/Beach.webp',
+            'assets/Snowy_Beach.webp',
+            'assets/Stony_Shore.webp',
+            'assets/Plains.webp',
+            'assets/Sunflower_Plains.webp',
+            'assets/Snowy_Plains.webp',
+            'assets/Ice_Spikes.webp',
+            'assets/Desert.webp',
+            'assets/Savanna.webp',
+            'assets/Savanna_Plateau.webp',
+            'assets/Windswept_Savanna.webp',
+            'assets/Badlands.webp',
+            'assets/Wooded_Badlands.webp',
+            'assets/Eroded_Badlands.webp',
+            'assets/Deep_Dark.webp',
+            'assets/Dripstone_Cave.webp',
+            'assets/Lush_Cave.webp',
+            'assets/Nether_Wastes.webp',
+            'assets/Soul_Sand_Valley.webp',
+            'assets/Crimson_Forest.webp',
+            'assets/Warped_Forest.webp',
+            'assets/Basalt_Deltas.webp',
+            'assets/The_End.webp',
+            'assets/Small_End_Islands.webp',
+            'assets/End_Midlands.webp',
+            'assets/End_Highlands.webp',
+            'assets/End_Barrens.webp',
+            'assets/The_Void.webp'
+        ];
+        // ==============================================================================
+        // 🛑 DO NOT EDIT BELOW THIS LINE 🛑
+        // ==============================================================================
+
+        const grid = document.getElementById('image-grid');
+
+        /**
+         * Cleans up the filename to create a human-readable title.
+         * e.g., 'assets/Eroded_Badlands.webp' -> 'Eroded Badlands'
+         */
+        function formatTitle(filepath) {
+            // Remove 'assets/' prefix if present
+            let filename = filepath.replace('assets/', '');
+            // Remove file extension
+            let title = filename.replace(/\.(webp|png|jpg|jpeg|gif)$/i, '');
+            // Replace underscores with spaces
+            title = title.replace(/_/g, ' ');
+            // Capitalize first letter of each word
+            return title.replace(/\b\w/g, char => char.toUpperCase());
+        }
+
+        imageFiles.forEach(fileName => {
+            const title = formatTitle(fileName);
+
+            // Create the card element for each image
+            const card = document.createElement('div');
+            card.className = 'image-card rounded-xl shadow-lg overflow-hidden'; 
+
+            // Create the image element
+            const img = document.createElement('img');
+            img.src = fileName; // Now correctly points to assets/image_name.webp
+            img.alt = title + ' Biome Image';
+            img.className = 'w-full h-auto object-cover rounded-t-xl';
+            img.loading = 'lazy'; // Improve performance for many images
+            
+            // Add an onerror handler to show a placeholder if the actual image fails to load
+            img.onerror = function() {
+                // Placeholder uses black background and neon green text
+                const placeholderText = encodeURIComponent(title.replace(/\s/g, '\n'));
+                this.src = `https://placehold.co/400x225/1a1a1a/00ff00?text=${placeholderText}`;
+                this.alt = 'Image failed to load: ' + title;
+                this.style.filter = 'none'; // Clear, not blurred
+                console.error('Failed to load image:', fileName);
+            };
+
+            // Create the caption/footer
+            const footer = document.createElement('div');
+            footer.className = 'p-4';
+
+            const caption = document.createElement('p');
+            // Updated class for neon green text
+            caption.className = 'text-green-400 font-semibold text-sm truncate';
+            caption.textContent = title;
+
+            // Assemble the card
+            footer.appendChild(caption);
+            card.appendChild(img);
+            card.appendChild(footer);
+            
+            grid.appendChild(card);
+        });
+
+        // Update the header count dynamically based on the array length
+        document.querySelector('header p').textContent = `ACCESS GRANTED. Displaying responsive grid data (${imageFiles.length} total).`;
+
+    </script>
+</body>
+</html>
